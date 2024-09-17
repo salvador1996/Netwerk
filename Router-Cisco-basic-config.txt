@@ -1,0 +1,50 @@
+! Set hostname
+hostname Router1
+
+! Activate enable mode
+enable secret cisco123
+
+! Configuring console access
+line console 0
+ password cisco123
+ login
+
+! Configure Telnet or SSH access
+line vty 0 4
+ password cisco123
+ login
+
+! Configuring network interfaces
+interface GigabitEthernet0/0
+ ip address 192.168.1.1 255.255.255.0
+ no shutdown
+
+interface GigabitEthernet0/1
+ ip address 10.0.0.1 255.255.255.0
+ no shutdown
+
+! Define a default route
+ip route 0.0.0.0 0.0.0.0 10.0.0.254
+
+! Enable IP routing
+ip routing
+
+! Configure DNS server
+ip name-server 8.8.8.8
+
+! Create a DHCP pool for 4 computers
+ip dhcp pool LAN_POOL
+ network 192.168.1.0 255.255.255.0
+ default-router 192.168.1.1     ! Router IP to be default gateway
+ dns-server 8.8.8.8             ! Server DNS Google
+ lease 10                       ! Rental period (10 days)
+
+! IP address range to be assigned to computers (192.168.1.2 à 192.168.1.5)
+ip dhcp pool COMPUTERS
+ network 192.168.1.0 255.255.255.0
+ default-router 192.168.1.1
+ dns-server 8.8.8.8
+ lease 10
+
+! Save configuration
+write memory
