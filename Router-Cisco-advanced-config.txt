@@ -1,0 +1,24 @@
+! Define an ACL for guests
+access-list 100 permit ip 192.168.10.0 0.0.0.255 any
+
+! Create a QoS class for guests
+class-map match-any GUESTS_CLASS
+ match access-group 100
+
+! Create a policy to limit speed to 1 Gbps
+policy-map GUESTS_POLICY
+ class GUESTS_CLASS
+  police 1000000000 2000000 2000000 conform-action transmit exceed-action drop violate-action drop
+
+! Create a policy to limit data to 500 MB
+policy-map GUESTS_DATA_POLICY
+ class GUESTS_CLASS
+  police 500000000 2000000 2000000 conform-action transmit exceed-action drop
+
+! Apply policies on the interface used by guests
+interface GigabitEthernet0/2
+ service-policy input GUESTS_POLICY
+ service-policy input GUESTS_DATA_POLICY
+
+! Save configuration
+write memory
